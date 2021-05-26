@@ -26,8 +26,8 @@ public class UserDaoImpl implements UserDao {
     }
 
     public void deleteById(long id) {
-        Query query = entityManager.createQuery("DELETE FROM User u WHERE u.id=?1");
-        query.setParameter(1, id);
+        Query query = entityManager.createQuery("DELETE FROM User u WHERE u.id=:id");
+        query.setParameter("id", id);
         query.executeUpdate();
     }
 
@@ -37,7 +37,6 @@ public class UserDaoImpl implements UserDao {
     }
 
     public List<User> findAll() {
-        Query query = entityManager.createQuery("SELECT u FROM User u ", User.class);
-        return (List<User>) query.getResultList();
+        return entityManager.createQuery("SELECT u FROM User u", User.class).getResultList();
     }
 }
