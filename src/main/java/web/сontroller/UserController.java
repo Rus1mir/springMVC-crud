@@ -1,22 +1,15 @@
 package web.сontroller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import web.model.Message;
 import web.model.User;
 import web.service.UserService;
-
-import javax.persistence.EntityNotFoundException;
-import javax.swing.text.html.parser.Entity;
-
-//import javax.validation.Valid;
 
 @Controller
 public class UserController {
@@ -29,7 +22,7 @@ public class UserController {
 
     @GetMapping(value = "/")
     public String showUserList(ModelMap model) {
-        model.addAttribute("listUsers", userService.getAll());
+        model.addAttribute("listUsers", userService.findAll());
         return "index";
     }
 
@@ -48,7 +41,7 @@ public class UserController {
     @PostMapping("/update/{id}")
     public String updateUser(@PathVariable("id") long id, User user, ModelMap model) {
 
-        userService.save(user);
+        userService.update(user);
         return "redirect:/";
     }
 
@@ -70,7 +63,7 @@ public class UserController {
     @ExceptionHandler({IllegalArgumentException.class})
     public ModelAndView error(IllegalArgumentException e) {
         ModelAndView modelAndView = new ModelAndView("error_page");
-        Message message = new Message("Произошла ошибка сервера ...", e.getMessage());
+        Message message = new Message("Похоже нам не удалось найти пользователя...", e.getMessage());
         modelAndView.addObject("message", message);
         return modelAndView;
     }
@@ -79,7 +72,7 @@ public class UserController {
     @ExceptionHandler(Exception.class)
     public ModelAndView error(Exception e) {
         ModelAndView modelAndView = new ModelAndView("error_page");
-        Message message = new Message("Похоже нам не удалось найти пользователя...", e.getMessage());
+        Message message = new Message("Произошла ошибка сервера ...", e.getMessage());
         modelAndView.addObject("message", message);
         return modelAndView;
     }
