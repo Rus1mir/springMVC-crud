@@ -6,6 +6,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.JpaVendorAdapter;
@@ -18,6 +19,7 @@ import java.util.Properties;
 
 
 @Configuration
+@EnableJpaRepositories(basePackages = "web.dao")
 @PropertySource("classpath:db.properties")
 @EnableTransactionManagement
 
@@ -27,7 +29,7 @@ public class AppConfig {
    private Environment env;
 
    @Bean
-   public LocalContainerEntityManagerFactoryBean getEntityManagerFactory() {
+   public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
       LocalContainerEntityManagerFactoryBean em
               = new LocalContainerEntityManagerFactoryBean();
       em.setDataSource(getDataSource());
@@ -54,9 +56,9 @@ public class AppConfig {
    }
 
    @Bean
-   public JpaTransactionManager getTransactionManager() {
+   public JpaTransactionManager transactionManager() {
       JpaTransactionManager transactionManager = new JpaTransactionManager();
-      transactionManager.setEntityManagerFactory(getEntityManagerFactory().getObject());
+      transactionManager.setEntityManagerFactory(entityManagerFactory().getObject());
       return transactionManager;
    }
 }

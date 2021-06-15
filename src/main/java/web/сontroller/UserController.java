@@ -1,15 +1,13 @@
 package web.сontroller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.ModelAndView;
-import web.model.Message;
 import web.model.User;
 import web.service.UserService;
+
+import java.security.Principal;
 
 @Controller
 public class UserController {
@@ -20,60 +18,22 @@ public class UserController {
         this.userService = userService;
     }
 
-    @GetMapping(value = "/")
-    public String showUserList(ModelMap model) {
-        model.addAttribute("listUsers", userService.findAll());
+    @GetMapping(value = "/login")
+    public String loginPage() {
+        return "login";
+    }
+
+    @GetMapping(value = {"/", "index"})
+    public String showUserList() {
         return "index";
     }
 
-    @GetMapping("/newuser")
-    public String showAddForm(User user) {
-        return "add_user";
-    }
-
-
-    @PostMapping("/save")
-    public String addUser(Model model, @ModelAttribute("user") User user) {
-        userService.save(user);
-        return "redirect:/";
-    }
-
-    @PostMapping("/update/{id}")
-    public String updateUser(@PathVariable("id") long id, User user, ModelMap model) {
-
-        userService.update(user);
-        return "redirect:/";
-    }
-
-    @GetMapping(value = "/edit/{id}")
-    public String showUpdateForm(@PathVariable("id") long id, Model model) {
-        User user = userService.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid user Id:" + id));
+    @GetMapping(value = "user/userpage")
+    public String UserPage(ModelMap model, Principal principal) {
+        User user = userService.findByLogin(principal.getName())
+                .orElseThrow(() -> new IllegalArgumentException("User with login: " + principal.getName() + " was not found"));
         model.addAttribute("user", user);
-        return "update_user";
+        return "userpage";
     }
 
-    @GetMapping(value = "/delete/{id}")
-    public String deleteUsers(@PathVariable("id") int id) {
-        userService.deleteById(id);
-        return "redirect:/";
-    }
-
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    @ExceptionHandler({IllegalArgumentException.class})
-    public ModelAndView error(IllegalArgumentException e) {
-        ModelAndView modelAndView = new ModelAndView("error_page");
-        Message message = new Message("Похоже нам не удалось найти пользователя...", e.getMessage());
-        modelAndView.addObject("message", message);
-        return modelAndView;
-    }
-
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    @ExceptionHandler(Exception.class)
-    public ModelAndView error(Exception e) {
-        ModelAndView modelAndView = new ModelAndView("error_page");
-        Message message = new Message("Произошла ошибка сервера ...", e.getMessage());
-        modelAndView.addObject("message", message);
-        return modelAndView;
-    }
 }

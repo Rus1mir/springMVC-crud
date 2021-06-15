@@ -39,4 +39,11 @@ public class UserDaoImpl implements UserDao {
     public List<User> findAll() {
         return entityManager.createQuery("SELECT u FROM User u", User.class).getResultList();
     }
+
+    public Optional<User> findByLogin(String login) {
+        Query query = entityManager.createQuery("SELECT u FROM User u JOIN FETCH u.roles WHERE u.login = :login", User.class);
+        query.setParameter("login", login);
+        Optional<User> user = Optional.ofNullable((User) query.getResultStream().findFirst().orElse(null));
+        return user;
+    }
 }

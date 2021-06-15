@@ -15,4 +15,6 @@ public interface UserDao {
     Optional<User> findById(long id);
 
     List<User> findAll();
+
+    Optional<User> findByLogin(String login);
 }
